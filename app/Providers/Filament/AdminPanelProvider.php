@@ -32,12 +32,14 @@ class AdminPanelProvider extends PanelProvider
                 'danger' => Color::Red,
                 'gray' => Color::Zinc,
                 'info' => Color::Blue,
-                'primary' => Color::Sky,
+                'primary' => Color::Rose,
                 'success' => Color::Green,
                 'warning' => Color::Amber,
             ])
             ->brandLogo(fn () => view('logo'))
+            ->brandLogoHeight('3rem')
             ->favicon(asset('images/favicon.png'))
+            ->darkMode(false)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
