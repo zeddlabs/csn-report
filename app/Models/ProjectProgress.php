@@ -9,6 +9,8 @@ class ProjectProgress extends Model
 {
     use HasFactory;
 
+    protected $table = 'project_progresses';
+
     protected $fillable = [
         'client_id',
         'total_progress',

@@ -24,4 +24,9 @@ class Work extends Model
     {
         return $this->belongsTo(WorkType::class);
     }
+
+    public function materials()
+    {
+        return $this->hasMany(Material::class);
+    }
 }
