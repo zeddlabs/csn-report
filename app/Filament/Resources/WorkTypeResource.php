@@ -18,6 +18,7 @@ class WorkTypeResource extends Resource
     protected static ?string $model = WorkType::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-bookmark-square';
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {

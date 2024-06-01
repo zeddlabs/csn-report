@@ -25,6 +25,7 @@ class ProjectProgressResource extends Resource
     protected static ?string $pluralModelLabel = 'Project Progress';
     protected static ?string $navigationIcon = 'heroicon-o-chart-pie';
     protected static ?string $navigationLabel = 'Project Progress';
+    protected static ?int $navigationSort = 3;
     protected static ?string $slug = 'project-progress';
 
     public static function form(Form $form): Form
