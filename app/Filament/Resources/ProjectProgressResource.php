@@ -6,6 +6,7 @@ use App\Filament\Resources\ProjectProgressResource\Pages;
 use App\Filament\Resources\ProjectProgressResource\RelationManagers;
 use App\Models\Client;
 use App\Models\ProjectProgress;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
@@ -17,7 +18,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ProjectProgressResource extends Resource
+class ProjectProgressResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = ProjectProgress::class;
 
@@ -265,6 +266,18 @@ class ProjectProgressResource extends Resource
             'create' => Pages\CreateProjectProgress::route('/create'),
             'view' => Pages\ViewProjectProgress::route('/{record}'),
             'edit' => Pages\EditProjectProgress::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any',
         ];
     }
 }

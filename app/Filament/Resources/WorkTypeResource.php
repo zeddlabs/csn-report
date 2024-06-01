@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\WorkTypeResource\Pages;
 use App\Filament\Resources\WorkTypeResource\RelationManagers;
 use App\Models\WorkType;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,7 +14,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class WorkTypeResource extends Resource
+class WorkTypeResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = WorkType::class;
 
@@ -75,6 +76,18 @@ class WorkTypeResource extends Resource
             'index' => Pages\ListWorkTypes::route('/'),
             'create' => Pages\CreateWorkType::route('/create'),
             'edit' => Pages\EditWorkType::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any',
         ];
     }
 }
