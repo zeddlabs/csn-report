@@ -72,6 +72,44 @@ class ClientResource extends Resource implements HasShieldPermissions
                             ->default(0)
                             ->readOnly(),
                     ]),
+                Forms\Components\Section::make('Works Information')
+                    ->relationship('projectProgress')
+                    ->schema([
+                        Forms\Components\Repeater::make('works')
+                            ->relationship()
+                            ->schema([
+                                Forms\Components\Select::make('work_type_id')
+                                    ->relationship('workType', 'name')
+                                    ->label('Work Type')
+                                    ->required()
+                                    ->searchable()
+                                    ->preload(),
+                                Forms\Components\TextInput::make('name')
+                                    ->required(),
+                                Forms\Components\Repeater::make('materials')
+                                    ->relationship()
+                                    ->columns(3)
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name')
+                                            ->required()
+                                            ->columnSpanFull(),
+                                        Forms\Components\TextInput::make('unit')
+                                            ->required(),
+                                        Forms\Components\TextInput::make('quantity_plan')
+                                            ->label('Quantity (Plan)')
+                                            ->numeric()
+                                            ->default(0)
+                                            ->minValue(0)
+                                            ->required(),
+                                        Forms\Components\TextInput::make('unit_price')
+                                            ->label('Unit Price')
+                                            ->prefix('Rp')
+                                            ->numeric()
+                                            ->default(0)
+                                            ->required(),
+                                    ]),
+                            ]),
+                    ]),
             ]);
     }
 

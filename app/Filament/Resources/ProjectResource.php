@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ProjectResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProjectResource\RelationManagers;
+use Barryvdh\DomPDF\Facade\Pdf;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Get;
@@ -127,9 +128,11 @@ class ProjectResource extends Resource implements HasShieldPermissions
                 Tables\Columns\TextColumn::make('area')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total_cost_exclude_ppn')
+                    ->label('Total Cost (Exclude PPN)')
                     ->money('IDR', locale: 'id')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_cost_rounded')
+                    ->label('Total Cost (Rounded)')
                     ->money('IDR', locale: 'id')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -162,6 +165,15 @@ class ProjectResource extends Resource implements HasShieldPermissions
                     })
             ])
             ->actions([
+                Tables\Actions\Action::make('print')
+                    ->label('Print')
+                    ->color('danger')
+                    ->icon('heroicon-m-printer')
+                    ->action(function ($record) {
+                        return response()->streamDownload(function () use ($record) {
+                            echo Pdf::loadView('reports.client', ['record' => $record])->setPaper('b4')->stream();
+                        }, 'Client Report.pdf');
+                    }),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])

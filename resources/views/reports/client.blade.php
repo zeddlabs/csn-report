@@ -84,12 +84,12 @@
       <div class="title">
         <h2 style="text-transform: uppercase">PT {{ config('app.name') }}</h2>
         <h3>NEGOSIASI HARGA PEKERJAAN</h3>
-        <h3>TAHUN ANGGARAN {{ \Carbon\Carbon::parse($clients[0]->project->created_at)->translatedFormat('Y') }}</h3>
+        <h3>TAHUN ANGGARAN {{ \Carbon\Carbon::parse($record->created_at)->translatedFormat('Y') }}</h3>
       </div>
     </div>
     <div class="info">
-      <p><span class="label">Nama Kegiatan </span> : {{ $clients[0]->project->name }}</p>
-      <p><span class="label">Area/Hosbu/Proyek </span> : {{ $clients[0]->project->area }}</p>
+      <p><span class="label">Nama Kegiatan </span> : {{ $record->name }}</p>
+      <p><span class="label">Area/Hosbu/Proyek </span> : {{ $record->area }}</p>
     </div>
     <table>
       <thead>
@@ -111,7 +111,7 @@
           <td></td>
           <td></td>
         </tr>
-        @foreach ($clients as $client)
+        @foreach ($record->clients as $client)
           <tr>
             <td>1.{{ $loop->iteration }}</td>
             <td style="text-align: left">{{ $client->name }}</td>
@@ -125,11 +125,11 @@
       <tfoot>
         <tr>
           <td colspan="5">Total Harga Pekerjaan Exclude PPN</td>
-          <td>Rp {{ number_format($clients[0]->project->total_cost_exclude_ppn, 2, ',', '.') }}</td>
+          <td>Rp {{ number_format($record->total_cost_exclude_ppn, 2, ',', '.') }}</td>
         </tr>
         <tr>
           <td colspan="5">Total Harga Pembulatan</td>
-          <td>Rp {{ number_format($clients[0]->project->total_cost_rounded, 2, ',', '.') }}</td>
+          <td>Rp {{ number_format($record->total_cost_rounded, 2, ',', '.') }}</td>
         </tr>
       </tfoot>
     </table>
