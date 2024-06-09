@@ -6,6 +6,8 @@ use App\Filament\Resources\ProjectProgressResource\Pages;
 use App\Filament\Resources\ProjectProgressResource\RelationManagers;
 use App\Models\Client;
 use App\Models\ProjectProgress;
+use App\Models\WorkType;
+use Barryvdh\DomPDF\Facade\Pdf;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
@@ -142,17 +144,21 @@ class ProjectProgressResource extends Resource implements HasShieldPermissions
                                             ->default(0)
                                             ->readOnly(),
                                     ]),
+                                Forms\Components\FileUpload::make('attachment')
+                                    ->image()
                             ])
                             ->live()
                             ->afterStateUpdated(function (Get $get, Set $set) {
                                 $works = $get('works');
 
-                                $totalProgress = collect($works)->flatMap(fn ($work) => collect($work['materials']))->sum('weight_factory') / 100;
+                                $totalProgress = collect($works)->flatMap(fn ($work) => collect($work['materials']))->sum('weight_factory');
+                                $totalProgress = $totalProgress / collect($works)->flatMap(fn ($work) => collect($work['materials']))->count();
+
                                 $constructionCost = collect($works)->flatMap(fn ($work) => collect($work['materials']))->sum('total_price');
                                 $ppn = $constructionCost * 0.11;
                                 $totalConstructionCost = $constructionCost + $ppn;
 
-                                $set('total_progress', round($totalProgress));
+                                $set('total_progress', round($totalProgress, 2));
                                 $set('construction_cost', round($constructionCost, 2));
                                 $set('ppn', round($ppn, 2));
                                 $set('total_construction_cost', round($totalConstructionCost, 2));
@@ -161,7 +167,9 @@ class ProjectProgressResource extends Resource implements HasShieldPermissions
                                 return $action->after(function (Get $get, Set $set) {
                                     $works = $get('works');
 
-                                    $totalProgress = collect($works)->flatMap(fn ($work) => collect($work['materials']))->sum('weight_factory') / 100;
+                                    $totalProgress = collect($works)->flatMap(fn ($work) => collect($work['materials']))->sum('weight_factory');
+                                    $totalProgress = $totalProgress / collect($works)->flatMap(fn ($work) => collect($work['materials']))->count();
+
                                     $constructionCost = collect($works)->flatMap(fn ($work) => collect($work['materials']))->sum('total_price');
                                     $ppn = $constructionCost * 0.11;
                                     $totalConstructionCost = $constructionCost + $ppn;
@@ -200,6 +208,12 @@ class ProjectProgressResource extends Resource implements HasShieldPermissions
                             ->numeric()
                             ->default(0)
                             ->readOnly(),
+                        Forms\Components\Toggle::make('is_approved')
+                            ->onIcon('heroicon-m-check')
+                            ->offIcon('heroicon-m-x-mark')
+                            ->onColor('success')
+                            ->offColor('danger')
+                            ->visible(fn () => auth()->user()->hasRole('super_admin')),
                     ]),
             ]);
     }
@@ -229,6 +243,17 @@ class ProjectProgressResource extends Resource implements HasShieldPermissions
                     ->label('Total Construction Cost')
                     ->money('IDR', locale: 'id')
                     ->sortable(),
+                Tables\Columns\IconColumn::make('is_approved')
+                    ->label('Approved')
+                    ->icon(fn (bool $state): string => match ($state) {
+                        false => 'heroicon-o-clock',
+                        true => 'heroicon-o-check-circle',
+                    })
+                    ->color(fn (bool $state): string => match ($state) {
+                        false => 'warning',
+                        true => 'success',
+                    })
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -242,6 +267,23 @@ class ProjectProgressResource extends Resource implements HasShieldPermissions
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('print')
+                    ->label('Print')
+                    ->color('danger')
+                    ->icon('heroicon-m-printer')
+                    ->action(function (ProjectProgress $progress) {
+                        $workTypes = WorkType::with(['works' => function ($query) use ($progress) {
+                            $query->where('project_progress_id', $progress->id);
+                        }])->get();
+
+                        return response()->streamDownload(function () use ($progress, $workTypes) {
+                            echo Pdf::loadView('reports.progress', [
+                                'progress' => $progress,
+                                'workTypes' => $workTypes,
+                            ])->setPaper('b3')->stream();
+                        }, 'BOQ Project Progress.pdf');
+                    })
+                    ->visible(fn ($record) => $record->is_approved),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])

@@ -17,6 +17,11 @@ class ProjectProgress extends Model
         'construction_cost',
         'ppn',
         'total_construction_cost',
+        'is_approved',
+    ];
+
+    protected $casts = [
+        'is_approved' => 'boolean',
     ];
 
     public function client()

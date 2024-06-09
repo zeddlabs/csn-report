@@ -18,6 +18,7 @@ return new class extends Migration
             $table->double('construction_cost')->default(0);
             $table->double('ppn')->default(0);
             $table->double('total_construction_cost')->default(0);
+            $table->boolean('is_approved')->default(false);
             $table->timestamps();
         });
     }

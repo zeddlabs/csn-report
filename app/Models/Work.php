@@ -13,6 +13,7 @@ class Work extends Model
         'project_progress_id',
         'work_type_id',
         'name',
+        'attachment',
     ];
 
     public function projectProgress()

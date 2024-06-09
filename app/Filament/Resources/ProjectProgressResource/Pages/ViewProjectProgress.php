@@ -27,7 +27,6 @@ class ViewProjectProgress extends ViewRecord
                     $workTypes = WorkType::with(['works' => function ($query) use ($progress) {
                         $query->where('project_progress_id', $progress->id);
                     }])->get();
-                    // dd($workTypes[0]->works);
 
                     return response()->streamDownload(function () use ($progress, $workTypes) {
                         echo Pdf::loadView('reports.progress', [
@@ -35,7 +34,8 @@ class ViewProjectProgress extends ViewRecord
                             'workTypes' => $workTypes,
                         ])->setPaper('b3')->stream();
                     }, 'BOQ Project Progress.pdf');
-                }),
+                })
+                ->visible(fn ($record) => $record->is_approved),
             Actions\EditAction::make(),
         ];
     }

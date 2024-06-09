@@ -2,19 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\User;
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use Filament\AvatarProviders\UiAvatarsProvider;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use App\Models\User;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
+use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\UserResource\Pages;
+use Filament\AvatarProviders\UiAvatarsProvider;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\UserResource\RelationManagers;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+
+use function Pest\Laravel\options;
 
 class UserResource extends Resource implements HasShieldPermissions
 {
@@ -46,6 +49,7 @@ class UserResource extends Resource implements HasShieldPermissions
                             ->required(fn (string $context): bool => $context === 'create'),
                         Forms\Components\Select::make('roles')
                             ->relationship('roles', 'name')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => Str::headline($record->name))
                             ->multiple()
                             ->preload()
                             ->searchable()
@@ -65,6 +69,7 @@ class UserResource extends Resource implements HasShieldPermissions
                 Tables\Columns\TextColumn::make('username')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('roles.name')
+                    ->formatStateUsing(fn ($state): string => Str::headline($state))
                     ->badge(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

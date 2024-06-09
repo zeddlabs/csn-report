@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('area');
             $table->double('total_cost_exclude_ppn');
             $table->double('total_cost_rounded');
+            $table->boolean('is_approved')->default(false);
             $table->timestamps();
         });
     }

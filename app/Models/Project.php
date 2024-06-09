@@ -14,6 +14,11 @@ class Project extends Model
         'area',
         'total_cost_exclude_ppn',
         'total_cost_rounded',
+        'is_approved',
+    ];
+
+    protected $casts = [
+        'is_approved' => 'boolean',
     ];
 
     public function clients()

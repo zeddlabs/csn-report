@@ -90,6 +90,10 @@
     .description {
       text-align: left;
     }
+
+    .approval {
+      text-align: right;
+    }
   </style>
 </head>
 
@@ -179,6 +183,12 @@
         </tr>
       </tfoot>
     </table>
+    <div class="approval">
+      <p>Medan, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
+      <p>Menyetujui,</p>
+      <img src="{{ asset('images/approved.webp') }}" alt="" height="100px">
+      <p>PT {{ config('app.name') }}</p>
+    </div>
   </div>
 </body>
 

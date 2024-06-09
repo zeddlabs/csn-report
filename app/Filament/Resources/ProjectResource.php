@@ -39,6 +39,12 @@ class ProjectResource extends Resource implements HasShieldPermissions
                             ->required()
                             ->maxLength(255)
                             ->columnSpanFull(),
+                        Forms\Components\Toggle::make('is_approved')
+                            ->onIcon('heroicon-m-check')
+                            ->offIcon('heroicon-m-x-mark')
+                            ->onColor('success')
+                            ->offColor('danger')
+                            ->visible(fn () => auth()->user()->hasRole('super_admin')),
                     ]),
                 Forms\Components\Section::make('Project Clients Information')
                     ->schema([
@@ -135,6 +141,17 @@ class ProjectResource extends Resource implements HasShieldPermissions
                     ->label('Total Cost (Rounded)')
                     ->money('IDR', locale: 'id')
                     ->sortable(),
+                Tables\Columns\IconColumn::make('is_approved')
+                    ->label('Approved')
+                    ->icon(fn (bool $state): string => match ($state) {
+                        false => 'heroicon-o-clock',
+                        true => 'heroicon-o-check-circle',
+                    })
+                    ->color(fn (bool $state): string => match ($state) {
+                        false => 'warning',
+                        true => 'success',
+                    })
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -173,7 +190,8 @@ class ProjectResource extends Resource implements HasShieldPermissions
                         return response()->streamDownload(function () use ($record) {
                             echo Pdf::loadView('reports.client', ['record' => $record])->setPaper('b4')->stream();
                         }, 'Client Report.pdf');
-                    }),
+                    })
+                    ->visible(fn ($record) => $record->is_approved),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
